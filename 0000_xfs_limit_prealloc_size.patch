@@ -1,0 +1,21 @@
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index ab5512c0b..b373422a4 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -520,6 +520,16 @@ xfs_iomap_prealloc_size(
+ 	if (alloc_blocks > XFS_MAX_BMBT_EXTLEN)
+ 		alloc_blocks = XFS_MAX_BMBT_EXTLEN;
+ 
++	/*
++	 * Comment for the patch:
++	 *
++	 * The maximum value for alloc_blocks is 8GB.
++	 * However, when the disk space is relatively small (e.g., 40GB),
++	 * pre-allocated space would take up a large proportion of the total disk space,
++	 * so we limit the size of alloc_blocks here to ensure that it does not exceed 1/16 of the remaining available disk space.
++	 */
++	freesp >>= 4;
++
+ 	/*
+ 	 * If we are still trying to allocate more space than is
+ 	 * available, squash the prealloc hard. This can happen if we
